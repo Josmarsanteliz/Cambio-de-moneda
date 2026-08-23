@@ -1,0 +1,16 @@
+# Dependencias
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Variables de entorno (si tuvieras archivos .env)
+.env
+
+# Builds de producción
+dist/
+build/
+
+# Carpetas de configuración de IDEs
+.vscode/
+.idea/
