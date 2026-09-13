@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { ThinkingOrb } from 'thinking-orbs';
 
+
 interface ExchangeRate {
   moneda: string;
   fuente: string;
@@ -15,7 +16,8 @@ interface ExchangeRate {
 export default function App() {
   const [rates, setRates] = useState<ExchangeRate[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [amount, setAmount] = useState<number>(100);
+  const [amount, setAmount] = useState<string>('100');
+  const [direction, setDirection] = useState<'FOREIGN_TO_VES' | 'VES_TO_FOREIGN'>('FOREIGN_TO_VES');
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
   
   // Estado para controlar el preloader de 3 segundos
@@ -30,7 +32,9 @@ export default function App() {
     // Consumo de la API
     axios.get('http://localhost:4000/api/rates')
       .then(response => {
-        setRates(response.data.data);
+        if (response.data && Array.isArray(response.data.data)) {
+          setRates(response.data.data);
+        }
         setLoading(false);
       })
       .catch(error => {
@@ -43,7 +47,16 @@ export default function App() {
 
   const currentRate = rates[selectedIndex] || rates[0];
   const rateValue = currentRate ? (currentRate.promedio || currentRate.venta || 0) : 0;
-  const calculatedVES = amount * rateValue;
+  const numericAmount = parseFloat(amount) || 0;
+
+  // Cálculos dinámicos según la dirección
+  const calculatedVES = direction === 'FOREIGN_TO_VES' 
+    ? numericAmount * rateValue 
+    : numericAmount;
+
+  const calculatedForeign = direction === 'VES_TO_FOREIGN' 
+    ? (rateValue > 0 ? numericAmount / rateValue : 0) 
+    : numericAmount;
 
   const stars = Array.from({ length: 15 });
 
@@ -54,7 +67,7 @@ export default function App() {
         <div className="flex flex-col items-center space-y-4">
           <ThinkingOrb state="solving" size={64} speed={0.60} />
           <span className="text-xs tracking-widest uppercase text-neutral-400 font-mono animate-pulse">
-            FX_CHECKER // LOADING...
+            tasas de cambio // CARGANDO...
           </span>
         </div>
       </div>
@@ -62,7 +75,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#050505] text-gray-100 font-sans antialiased relative overflow-hidden selection:bg-white selection:text-black">
+    <div className="min-h-screen bg-[#050505] text-gray-100 font-sans antialiased relative overflow-hidden selection:bg-white selection:text-black flex flex-col justify-between">
       
       {/* Fondo de Estrellas Fugaces (Shooting Stars) */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
@@ -89,7 +102,7 @@ export default function App() {
       </div>
 
       {/* Contenido Principal */}
-      <div className="relative z-10">
+      <div className="relative z-10 flex-1">
         
         {/* Header Minimalista Monocromático */}
         <header className="border-b border-neutral-800 bg-black/60 backdrop-blur-md sticky top-0 z-50">
@@ -97,18 +110,18 @@ export default function App() {
             
             <div className="flex items-center space-x-3 shrink-0">
               <span className="bg-white text-black font-black px-2.5 py-1 text-xs tracking-wider rounded shadow-sm">
-                FX_CHECKER
+                Jdev
               </span>
               <span className="text-xs text-neutral-400 tracking-widest uppercase font-medium hidden md:inline">
-                | VZLA
+                | TASAS DE CAMBIO VZLA
               </span>
             </div>
 
             {/* Carrusel de Tasas en el Header */}
             <div className="overflow-hidden relative w-full max-w-md flex items-center bg-neutral-900/80 px-4 py-1.5 rounded-lg border border-neutral-800">
               <div className="flex space-x-8 animate-marquee whitespace-nowrap text-xs">
-                {loading ? (
-                  <span className="text-neutral-500">Cargando mercado en vivo...</span>
+                {loading || rates.length === 0 ? (
+                  <span className="text-neutral-500">Cargando tasas en vivo...</span>
                 ) : (
                   [...rates, ...rates].map((rate, idx) => (
                     <div key={idx} className="flex items-center space-x-2 cursor-pointer" onClick={() => setSelectedIndex(idx % rates.length)}>
@@ -125,7 +138,7 @@ export default function App() {
             {/* Estado Online */}
             <div className="text-xs text-neutral-400 hidden lg:flex items-center space-x-2 bg-neutral-900 px-3 py-1.5 rounded-full border border-neutral-800 shrink-0">
               <span className="w-2 h-2 rounded-full bg-white animate-pulse"></span>
-              <span className="font-semibold text-neutral-300">LIVE</span>
+              <span className="font-semibold text-neutral-300">EN VIVO</span>
             </div>
           </div>
         </header>
@@ -133,44 +146,53 @@ export default function App() {
         {/* Main Container */}
         <main className="max-w-5xl mx-auto px-6 py-10">
           <div className="mb-8">
-            <h1 className="text-xl font-bold text-white tracking-wide uppercase">Check The Rate</h1>
+            <h1 className="text-xl font-bold text-white tracking-wide uppercase">Tasas de cambio</h1>
             <p className="text-xs text-neutral-400 mt-1">Calculadora de divisas con diseño minimalista en escala de grises.</p>
           </div>
 
-          {/* Tarjeta Principal de Conversión */}
+          {/* Tarjeta Principal de Conversión Bidireccional */}
           <div className="bg-neutral-900/90 border border-neutral-800 rounded-2xl p-6 md:p-8 shadow-2xl grid grid-cols-1 md:grid-cols-2 gap-6 relative backdrop-blur-sm">
             
-            {/* Input Origen */}
+            {/* Input Divisas */}
             <div className="bg-neutral-950 p-5 rounded-xl border border-neutral-800 flex flex-col justify-between">
-              <span className="text-xs text-neutral-400 font-semibold tracking-wider mb-2">
-                SEND ({currentRate?.moneda || 'USD'})
+              <span className="text-xs text-neutral-400 font-semibold tracking-wider mb-2 uppercase">
+                MONTO ({currentRate?.moneda || 'USD'})
               </span>
               <div className="flex justify-between items-center">
                 <input 
-                  type="number" 
-                  value={amount} 
-                  onChange={(e) => setAmount(Number(e.target.value))}
+                  type="text" 
+                  value={direction === 'FOREIGN_TO_VES' ? amount : calculatedForeign ? calculatedForeign.toFixed(2) : ''} 
+                  onChange={(e) => {
+                    setDirection('FOREIGN_TO_VES');
+                    setAmount(e.target.value);
+                  }}
                   className="bg-transparent text-3xl md:text-4xl font-extrabold text-white focus:outline-none w-full font-mono"
                 />
-                <span className="bg-neutral-900 border border-neutral-700 px-3 py-1.5 rounded-lg text-xs font-bold text-white shadow-inner">
+                <span className="bg-neutral-900 border border-neutral-700 px-3 py-1.5 rounded-lg text-xs font-bold text-white shadow-inner shrink-0">
                   {currentRate?.moneda === 'EUR' ? '🇪🇺 EUR' : '🇺🇸 USD'}
                 </span>
               </div>
             </div>
 
-            {/* Resultado VES */}
+            {/* Input VES */}
             <div className="bg-neutral-950 p-5 rounded-xl border border-neutral-800 flex flex-col justify-between">
               <div className="flex justify-between items-center mb-2">
-                <span className="text-xs text-neutral-400 font-semibold tracking-wider">RECEIVE (VES)</span>
+                <span className="text-xs text-neutral-400 font-semibold tracking-wider uppercase">MONTO (VES)</span>
                 <span className="text-[10px] bg-white/10 text-white px-2 py-0.5 rounded font-mono uppercase font-bold border border-white/20">
-                  {currentRate?.nombre}
+                  {currentRate?.nombre || 'General'}
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-3xl md:text-4xl font-extrabold text-white truncate font-mono">
-                  {loading ? '...' : calculatedVES.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                </span>
-                <span className="bg-neutral-900 border border-neutral-700 px-3 py-1.5 rounded-lg text-xs font-bold text-white shadow-inner">
+                <input 
+                  type="text" 
+                  value={direction === 'VES_TO_FOREIGN' ? amount : calculatedVES ? calculatedVES.toFixed(2) : ''} 
+                  onChange={(e) => {
+                    setDirection('VES_TO_FOREIGN');
+                    setAmount(e.target.value);
+                  }}
+                  className="bg-transparent text-3xl md:text-4xl font-extrabold text-white focus:outline-none w-full font-mono"
+                />
+                <span className="bg-neutral-900 border border-neutral-700 px-3 py-1.5 rounded-lg text-xs font-bold text-white shadow-inner shrink-0">
                   🇻🇪 VES
                 </span>
               </div>
@@ -235,6 +257,17 @@ export default function App() {
 
         </main>
       </div>
+
+      {/* Footer Minimalista */}
+      <footer className="relative z-10 border-t border-neutral-800/80 bg-black/40 backdrop-blur-md py-6 mt-12">
+        <div className="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-xs text-neutral-400 tracking-wider">
+            © {new Date().getFullYear()} Todos los derechos reservados <span className="text-white font-semibold">Jdev</span>
+          </p>
+          
+      </div>
+      </footer>
+
     </div>
   );
 }
