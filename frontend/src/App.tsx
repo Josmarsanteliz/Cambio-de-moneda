@@ -23,21 +23,31 @@ export default function App() {
   // Estado para controlar el preloader de 3 segundos
   const [showSplash, setShowSplash] = useState<boolean>(true);
 
-  useEffect(() => {
+useEffect(() => {
     // Timer de al menos 3 segundos para el preloader
     const timer = setTimeout(() => {
       setShowSplash(false);
     }, 3000);
 
-    // Consumo de la API
-    axios.get('http://localhost:4000/api/rates')
-      .then(response => {
-        if (response.data && Array.isArray(response.data.data)) {
-          setRates(response.data.data);
-        }
+    // Consumo directo de DolarAPI desde el frontend
+    Promise.all([
+      axios.get('https://ve.dolarapi.com/v1/dolares/oficial').catch(() => null),
+      axios.get('https://ve.dolarapi.com/v1/dolares/paralelo').catch(() => null),
+      axios.get('https://ve.dolarapi.com/v1/euros/oficial').catch(() => null),
+      axios.get('https://ve.dolarapi.com/v1/euros/paralelo').catch(() => null),
+    ])
+      .then(([dolarOficial, dolarParalelo, euroOficial, euroParalelo]) => {
+        const fetchedRates = [
+          dolarOficial?.data,
+          dolarParalelo?.data,
+          euroOficial?.data,
+          euroParalelo?.data,
+        ].filter(Boolean);
+
+        setRates(fetchedRates);
         setLoading(false);
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Error al obtener tasas:', error);
         setLoading(false);
       });
