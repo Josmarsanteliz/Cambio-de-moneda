@@ -1,39 +1,42 @@
-# 🇻🇿 FX Checker Venezuela
+# 🇻🇿 Cambio de Moneda | Tasas de Cambio Vzla
 
-Aplicación web full-stack para consultar las tasas de cambio oficiales (BCV) y del mercado paralelo en Venezuela, obtenidas en tiempo real a través de `DolarAPI`.
+Aplicación web minimalista para consultar las tasas de cambio oficiales (BCV) y del mercado paralelo en Venezuela, obtenidas en tiempo real a través de **DolarAPI**.
+
+---
 
 ## ✨ Características
 
-*   ⚡ **Preloader:** Animación de bienvenida con orbes giratorios al cargar la app.
-*   🚀 **Marquesina en Vivo:** Barra superior con carrusel continuo de las tasas principales (Dólar BCV, Dólar Paralelo, Euro BCV, Euro Paralelo).
-*   🧮 **Calculadora Inteligente:** Convierte montos de Dólares/Euros a Bolívares Venezolanos (VES) al instante.
-*    시장 **Diseño Minimalista Oscuro:** Interfaz elegante y moderna en escala de grises con animación de estrellas fugaces de fondo.
-*   📱 **Responsive:** Adaptable a dispositivos móviles y de escritorio.
+* **⚡ Preloader:** Animación de bienvenida con orbes giratorios al cargar la app.
+* **🚀 Marquesina en Vivo:** Barra superior con carrusel continuo de las tasas principales (Dólar BCV, Dólar Paralelo, Euro BCV, Euro Paralelo).
+* **🧮 Calculadora Inteligente:** Convierte montos de Dólares/Euros a Bolívares Venezolanos (VES) y viceversa al instante de forma bidireccional.
+* **🌌 Diseño Minimalista Oscuro:** Interfaz elegante y moderna en escala de grises con animación de estrellas fugaces de fondo (`Shooting Stars`).
+* **📱 Responsive:** 100% adaptable a dispositivos móviles y de escritorio.
+
+---
 
 ## 🛠️ Tecnologías Utilizadas
 
-**Frontend:**
-*   React.js con TypeScript
-*   Vite (para compilación rápida)
-*   Tailwind CSS (para el diseño)
-*   Axios (para peticiones HTTP)
-*   `thinking-orbs` (para la animación del preloader)
+### Frontend
+* **React 19** con **TypeScript**
+* **Vite** (para compilación ultra rápida)
+* **Tailwind CSS** (para el diseño y estilos)
+* **Axios** (para peticiones HTTP)
+* **thinking-orbs** (para la animación del preloader)
 
-**Backend:**
-*   Node.js
-*   Express.js (servidor)
-*   Axios (consumo de API externa)
-*   TypeScript
+### Backend (Opcional / Referencia de Proxy)
+* **Node.js** & **Express.js** (desarrollado inicialmente como proxy para el manejo de CORS)
+* **TypeScript**
 
-**Fuente de Datos:**
-*   [DolarAPI](https://dolarapi.com/)
+### Fuente de Datos
+* [DolarAPI Venezuela](https://ve.dolarapi.com/)
+
+---
 
 ## 🚀 Cómo Ejecutar Localmente
 
-Para correr este proyecto en tu computadora, necesitas tener instalado [Node.js](https://nodejs.org/).
+Para correr este proyecto en tu computadora, asegúrate de tener instalado **Node.js**.
 
 ### 1. Clonar el repositorio
-
 ```bash
-git clone [https://github.com/TU-USUARIO/fx-checker-venezuela.git](https://github.com/TU-USUARIO/fx-checker-venezuela.git)
-cd fx-checker-venezuela
+git clone [https://github.com/Josmarsanteliz/Cambio-de-moneda.git](https://github.com/Josmarsanteliz/Cambio-de-moneda.git)
+cd Cambio-de-moneda
