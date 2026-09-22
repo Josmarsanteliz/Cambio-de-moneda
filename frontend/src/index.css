@@ -1,5 +1,12 @@
 @import "tailwindcss";
 
+/* Fondo general: evita destello blanco al abrir la PWA */
+html, body {
+  background-color: #050505;
+  overscroll-behavior-y: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
 /* Fondo general y marquesina */
 @keyframes marquee {
   0% { transform: translateX(0%); }

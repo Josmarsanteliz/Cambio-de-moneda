@@ -1,6 +1,5 @@
 import  { useState, useEffect } from 'react';
 import axios from 'axios';
-import { ThinkingOrb } from 'thinking-orbs';
 
 
 interface ExchangeRate {
@@ -19,16 +18,8 @@ export default function App() {
   const [amount, setAmount] = useState<string>('100');
   const [direction, setDirection] = useState<'FOREIGN_TO_VES' | 'VES_TO_FOREIGN'>('FOREIGN_TO_VES');
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
-  
-  // Estado para controlar el preloader de 3 segundos
-  const [showSplash, setShowSplash] = useState<boolean>(true);
 
 useEffect(() => {
-    // Timer de al menos 3 segundos para el preloader
-    const timer = setTimeout(() => {
-      setShowSplash(false);
-    }, 3000);
-
     // Consumo directo de DolarAPI desde el frontend
     Promise.all([
       axios.get('https://ve.dolarapi.com/v1/dolares/oficial').catch(() => null),
@@ -51,8 +42,6 @@ useEffect(() => {
         console.error('Error al obtener tasas:', error);
         setLoading(false);
       });
-
-    return () => clearTimeout(timer);
   }, []);
 
   const currentRate = rates[selectedIndex] || rates[0];
@@ -70,22 +59,11 @@ useEffect(() => {
 
   const stars = Array.from({ length: 15 });
 
-  // Pantalla de Preloader (SplashScreen)
-  if (showSplash) {
-    return (
-      <div className="fixed inset-0 bg-[#050505] flex flex-col items-center justify-center z-50">
-        <div className="flex flex-col items-center space-y-4">
-          <ThinkingOrb state="solving" size={64} speed={0.60} />
-          <span className="text-xs tracking-widest uppercase text-neutral-400 font-mono animate-pulse">
-            tasas de cambio // CARGANDO...
-          </span>
-        </div>
-      </div>
-    );
-  }
+  // Sin datos y sin carga en curso -> sin conexión / error de API
+  const noRates = !loading && rates.length === 0;
 
   return (
-    <div className="min-h-screen bg-[#050505] text-gray-100 font-sans antialiased relative overflow-hidden selection:bg-white selection:text-black flex flex-col justify-between">
+    <div className="min-h-dvh bg-[#050505] text-gray-100 font-sans antialiased relative overflow-hidden selection:bg-white selection:text-black flex flex-col justify-between">
       
       {/* Fondo de Estrellas Fugaces (Shooting Stars) */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
@@ -115,23 +93,33 @@ useEffect(() => {
       <div className="relative z-10 flex-1">
         
         {/* Header Minimalista Monocromático */}
-        <header className="border-b border-neutral-800 bg-black/60 backdrop-blur-md sticky top-0 z-50">
-          <div className="max-w-6xl mx-auto px-6 h-16 flex justify-between items-center gap-4">
-            
-            <div className="flex items-center space-x-3 shrink-0">
-              <span className="bg-white text-black font-black px-2.5 py-1 text-xs tracking-wider rounded shadow-sm">
-                Jdev
-              </span>
-              <span className="text-xs text-neutral-400 tracking-widest uppercase font-medium hidden md:inline">
-                | TASAS DE CAMBIO VZLA
-              </span>
+        <header className="border-b border-neutral-800 bg-black/60 backdrop-blur-md sticky top-0 z-50 pt-[env(safe-area-inset-top)]">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-0 sm:h-16 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2.5 sm:gap-4">
+
+            {/* Fila 1: Logo + estado en vivo (móvil/tablet) */}
+            <div className="flex items-center justify-between gap-3 shrink-0">
+              <div className="flex items-center space-x-3 min-w-0">
+                <span className="bg-white text-black font-black px-2.5 py-1 text-xs tracking-wider rounded shadow-sm">
+                  Jdev
+                </span>
+                <span className="text-xs text-neutral-400 tracking-widest uppercase font-medium hidden sm:inline">
+                  | TASAS DE CAMBIO VZLA
+                </span>
+              </div>
+
+              <div className="flex lg:hidden items-center space-x-2 bg-neutral-900 px-3 py-1.5 rounded-full border border-neutral-800 shrink-0">
+                <span className="w-2 h-2 rounded-full bg-white animate-pulse"></span>
+                <span className="text-xs font-semibold text-neutral-300">EN VIVO</span>
+              </div>
             </div>
 
-            {/* Carrusel de Tasas en el Header */}
-            <div className="overflow-hidden relative w-full max-w-md flex items-center bg-neutral-900/80 px-4 py-1.5 rounded-lg border border-neutral-800">
+            {/* Fila 2: Carrusel de Tasas en el Header */}
+            <div className="overflow-hidden relative w-full sm:max-w-md flex items-center bg-neutral-900/80 px-4 py-1.5 rounded-lg border border-neutral-800">
               <div className="flex space-x-8 animate-marquee whitespace-nowrap text-xs">
-                {loading || rates.length === 0 ? (
+                {loading ? (
                   <span className="text-neutral-500">Cargando tasas en vivo...</span>
+                ) : noRates ? (
+                  <span className="text-neutral-500">Sin conexión — mostrando último guardado</span>
                 ) : (
                   [...rates, ...rates].map((rate, idx) => (
                     <div key={idx} className="flex items-center space-x-2 cursor-pointer" onClick={() => setSelectedIndex(idx % rates.length)}>
@@ -145,7 +133,7 @@ useEffect(() => {
               </div>
             </div>
 
-            {/* Estado Online */}
+            {/* Estado Online (desktop) */}
             <div className="text-xs text-neutral-400 hidden lg:flex items-center space-x-2 bg-neutral-900 px-3 py-1.5 rounded-full border border-neutral-800 shrink-0">
               <span className="w-2 h-2 rounded-full bg-white animate-pulse"></span>
               <span className="font-semibold text-neutral-300">EN VIVO</span>
@@ -154,14 +142,14 @@ useEffect(() => {
         </header>
 
         {/* Main Container */}
-        <main className="max-w-5xl mx-auto px-6 py-10">
+        <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
           <div className="mb-8">
             <h1 className="text-xl font-bold text-white tracking-wide uppercase">Tasas de cambio</h1>
             <p className="text-xs text-neutral-400 mt-1">Calculadora de divisas con diseño minimalista en escala de grises.</p>
           </div>
 
           {/* Tarjeta Principal de Conversión Bidireccional */}
-          <div className="bg-neutral-900/90 border border-neutral-800 rounded-2xl p-6 md:p-8 shadow-2xl grid grid-cols-1 md:grid-cols-2 gap-6 relative backdrop-blur-sm">
+          <div className="bg-neutral-900/90 border border-neutral-800 rounded-2xl p-4 sm:p-6 md:p-8 shadow-2xl grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 relative backdrop-blur-sm">
             
             {/* Input Divisas */}
             <div className="bg-neutral-950 p-5 rounded-xl border border-neutral-800 flex flex-col justify-between">
@@ -171,6 +159,9 @@ useEffect(() => {
               <div className="flex justify-between items-center">
                 <input 
                   type="text" 
+                  inputMode="decimal"
+                  autoComplete="off"
+                  enterKeyHint="done"
                   value={direction === 'FOREIGN_TO_VES' ? amount : calculatedForeign ? calculatedForeign.toFixed(2) : ''} 
                   onChange={(e) => {
                     setDirection('FOREIGN_TO_VES');
@@ -195,6 +186,9 @@ useEffect(() => {
               <div className="flex justify-between items-center">
                 <input 
                   type="text" 
+                  inputMode="decimal"
+                  autoComplete="off"
+                  enterKeyHint="done"
                   value={direction === 'VES_TO_FOREIGN' ? amount : calculatedVES ? calculatedVES.toFixed(2) : ''} 
                   onChange={(e) => {
                     setDirection('VES_TO_FOREIGN');
@@ -230,9 +224,13 @@ useEffect(() => {
           <div className="mt-8">
             <h2 className="text-sm font-bold text-neutral-400 uppercase tracking-wider mb-4">Mercado Actual</h2>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-5">
               {loading ? (
-                <div className="col-span-4 text-center py-10 text-neutral-500 font-medium">Sincronizando endpoints...</div>
+                <div className="sm:col-span-2 md:col-span-4 text-center py-10 text-neutral-500 font-medium">Sincronizando endpoints...</div>
+              ) : noRates ? (
+                <div className="sm:col-span-2 md:col-span-4 text-center py-10 text-neutral-500 font-medium">
+                  No se pudieron cargar las tasas. Revisa tu conexión a internet.
+                </div>
               ) : (
                 rates.map((rate, index) => (
                   <div 
@@ -269,13 +267,12 @@ useEffect(() => {
       </div>
 
       {/* Footer Minimalista */}
-      <footer className="relative z-10 border-t border-neutral-800/80 bg-black/40 backdrop-blur-md py-6 mt-12">
-        <div className="max-w-5xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-neutral-400 tracking-wider">
+      <footer className="relative z-10 border-t border-neutral-800/80 bg-black/40 backdrop-blur-md pt-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] mt-12">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-xs text-neutral-400 tracking-wider text-center sm:text-left">
             © {new Date().getFullYear()} Todos los derechos reservados <span className="text-white font-semibold">Jdev</span>
           </p>
-          
-      </div>
+        </div>
       </footer>
 
     </div>
