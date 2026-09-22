@@ -34,7 +34,9 @@ Aplicación web minimalista para consultar las tasas de cambio oficiales (BCV) y
 
 ## 📲 Cómo instalar la app en tu celular (PWA)
 
-1. La app debe estar publicada en **HTTPS** (cualquier hosting gratuito: Netlify, Vercel o GitHub Pages).
+**URL en vivo:** 👉 **https://jdev-tasas-vzla.vercel.app**
+
+1. La app debe estar publicada en **HTTPS** (ya desplegada en Vercel).
 2. Ábrela desde **Chrome en Android** (o **Safari en iPhone**).
 3. Toca el menú (⋮ en Android / compartir en iPhone) y elige **"Instalar aplicación"** / **"Agregar a pantalla de inicio"**.
 4. Listo: se abrirá en modo ventana propia (sin barra del navegador), con su ícono y fondo oscuro.
@@ -42,6 +44,7 @@ Aplicación web minimalista para consultar las tasas de cambio oficiales (BCV) y
 **Notas:**
 * La app guarda la última respuesta de DolarAPI en caché: si te quedas sin internet, muestra las últimas tasas conocidas.
 * El Service Worker solo se registra en el build de producción (`npm run build`), por eso no verás la PWA en `npm run dev`.
+* Para volver a desplegar tras un cambio: `cd frontend && npx vercel deploy --prod --yes`
 
 ---
 
