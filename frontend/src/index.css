@@ -1,8 +1,24 @@
 @import "tailwindcss";
 
+/* Paleta Josmar */
+@theme inline {
+  --color-floral: #fffcf2;        /* Floral White — fondo base */
+  --color-silver: #ccc5b9;        /* Silver — bordes y divisores */
+  --color-charcoal: #403d39;      /* Charcoal Brown — texto cuerpo */
+  --color-carbon: #252422;        /* Carbon Black — títulos y fondos oscuros */
+  --color-paprika: #eb5e28;       /* Spicy Paprika — acento principal */
+  --color-paprika-light: #f07a45; /* acento en hover (mantiene AA) */
+  --color-paprika-deep: #c9491a;  /* acento en texto pequeño (AA) */
+}
+
+::selection {
+  background: #eb5e28;
+  color: #fffcf2;
+}
+
 /* Fondo general: evita destello blanco al abrir la PWA */
 html, body {
-  background-color: #050505;
+  background-color: #fffcf2;
   overscroll-behavior-y: none;
   -webkit-tap-highlight-color: transparent;
 }
@@ -38,7 +54,7 @@ html, body {
   position: absolute;
   width: 2px;
   height: 80px;
-  background: linear-gradient(45deg, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
+  background: linear-gradient(45deg, rgba(235, 94, 40, 1), rgba(204, 197, 185, 0));
   animation: fall linear infinite;
   opacity: 0;
   pointer-events: none;

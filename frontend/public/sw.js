@@ -4,7 +4,7 @@
  * - Assets hashados: stale-while-revalidate
  * - DolarAPI: network-first con fallback a las últimas tasas cacheadas
  */
-const STATIC_CACHE = 'jdev-static-v1';
+const STATIC_CACHE = 'jdev-static-v2';
 const RATES_CACHE = 'jdev-rates-v1';
 const API_HOST = 've.dolarapi.com';
 
@@ -49,7 +49,7 @@ async function handleNavigation(request) {
     const cached = await caches.match('/');
     if (cached) return cached;
     return new Response(
-      '<!doctype html><html lang="es"><body style="background:#050505;color:#a3a3a3;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;text-align:center"><div><h1>Sin conexión</h1><p>No hay una versión guardada de la app. Conéctate a internet una vez para poder usarla offline.</p></div></body></html>',
+      '<!doctype html><html lang="es"><body style="background:#fffcf2;color:#403d39;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;text-align:center"><div><h1>Sin conexión</h1><p>No hay una versión guardada de la app. Conéctate a internet una vez para poder usarla offline.</p></div></body></html>',
       { status: 503, headers: { 'Content-Type': 'text/html; charset=utf-8' } }
     );
   }
